@@ -98,6 +98,29 @@ services:
       - elasticsearch
     restart: unless-stopped
 
+
+  fleet:
+    build:
+      context: fleet/
+      args:
+        ELASTIC_VERSION: ${ELASTIC_VERSION}
+    restart: unless-stopped
+    ports:
+      - 8220:8220
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+    user: root # note, synthetic browser monitors require this set to `elastic-agent`
+    environment:
+      - FLEET_ENROLLMENT_TOKEN=<enrollment-token>
+      - FLEET_ENROLL=1
+      - FLEET_URL=http://fleet:8220
+      - FLEET_SERVER_ENABLE=true
+      - FLEET_SERVER_ELASTICSEARCH_HOST=http://elasticsearch:9200
+      - FLEET_SERVER_SERVICE_TOKEN=AAEAAWVsYXN0aWMvZmxlZXQtc2VydmVyL3Rva2VuLTE2NzYyMDkzNzk4NDM6SVdpQ2d6M1hST0dOLTlfSDRodGRDQQ
+      - FLEET_SERVER_POLICY=fleet-server-policy
+
 networks:
   elk:
     driver: bridge
